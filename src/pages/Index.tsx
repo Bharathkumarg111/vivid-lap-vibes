@@ -116,97 +116,103 @@ const Index = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-bg">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-screen bg-gradient-bg relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-20 right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
+      
+      <div className="container mx-auto px-4 py-12 max-w-7xl relative z-10">
         {/* Header */}
-        <header className="text-center mb-12 animate-fade-in">
-          <h1 className="text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-3">
+        <header className="text-center mb-16 animate-fade-in-up">
+          <h1 className="text-7xl md:text-8xl font-black bg-gradient-primary bg-clip-text text-transparent mb-4 drop-shadow-lg tracking-tight">
             Laptop Usage Tracker
           </h1>
-          <p className="text-xl text-muted-foreground font-medium">
-            Track your productivity and stay motivated! 🚀
+          <p className="text-2xl text-foreground/80 font-semibold tracking-wide">
+            Track your productivity and stay motivated! 🚀✨
           </p>
         </header>
 
         {/* Timer Section */}
-        <div className="mb-12 animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <div className="mb-16 animate-scale-in" style={{ animationDelay: "200ms" }}>
           <TimerDisplay startTime={startTime} isRunning={isRunning} />
           
-          <div className="flex justify-center gap-4 mt-8">
+          <div className="flex flex-wrap justify-center gap-6 mt-12">
             <Button
               onClick={startSession}
               disabled={isRunning}
+              variant="success"
               size="lg"
-              className="bg-gradient-success hover:scale-105 transition-all duration-300 shadow-card hover:shadow-glow text-lg px-8 py-6 rounded-xl"
+              className="group relative overflow-hidden"
             >
-              <Play className="w-6 h-6 mr-2" />
-              Start Session
+              <Play className="w-6 h-6 mr-2 group-hover:rotate-12 transition-transform" />
+              <span className="relative z-10">Start Session</span>
             </Button>
             <Button
               onClick={endSession}
               disabled={!isRunning}
+              variant="destructive"
               size="lg"
-              className="bg-gradient-accent hover:scale-105 transition-all duration-300 shadow-card hover:shadow-glow text-lg px-8 py-6 rounded-xl"
+              className="group relative overflow-hidden"
             >
-              <Square className="w-6 h-6 mr-2" />
-              End Session
+              <Square className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+              <span className="relative z-10">End Session</span>
             </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           <StatCard
             title="Today's Total"
             value={`${getTodayTotal().toFixed(2)}h`}
             icon={Clock}
             gradient="primary"
-            delay={200}
+            delay={300}
           />
           <StatCard
             title="Total Days"
             value={getTotalDays()}
             icon={Calendar}
             gradient="accent"
-            delay={300}
+            delay={400}
           />
           <StatCard
             title="Total Hours"
             value={`${getTotalHours().toFixed(2)}h`}
             icon={TrendingUp}
             gradient="success"
-            delay={400}
+            delay={500}
           />
         </div>
 
         {/* Motivational Quote */}
-        <div className="mb-12">
+        <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
           <MotivationalQuote />
         </div>
 
         {/* Session History */}
-        <div className="mb-12">
+        <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "700ms" }}>
           <SessionHistory sessions={usageData} />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4 animate-fade-in" style={{ animationDelay: "500ms" }}>
+        <div className="flex flex-wrap justify-center gap-6 animate-fade-in-up pb-8" style={{ animationDelay: "800ms" }}>
           <Button
             onClick={exportCSV}
-            variant="outline"
+            variant="info"
             size="lg"
-            className="hover:bg-primary hover:text-primary-foreground transition-all duration-300 hover:scale-105"
+            className="group"
           >
-            <Download className="w-5 h-5 mr-2" />
+            <Download className="w-5 h-5 mr-2 group-hover:animate-bounce-subtle" />
             Export CSV
           </Button>
           <Button
             onClick={resetData}
             variant="outline"
             size="lg"
-            className="hover:bg-destructive hover:text-destructive-foreground transition-all duration-300 hover:scale-105"
+            className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive group"
           >
-            <RotateCcw className="w-5 h-5 mr-2" />
+            <RotateCcw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
             Reset Data
           </Button>
         </div>
