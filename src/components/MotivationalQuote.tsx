@@ -1,33 +1,35 @@
-import { Sparkles, Award } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, RefreshCw } from "lucide-react";
+import { Button } from "./ui/button";
 
-const dayQuotes = [
-  "Start Strong",
-  "Stay in Motion",
-  "Push Through",
-  "Focus Mode",
-  "Halfway There",
-  "Level Up",
-  "Rest Smartly",
-  "Renew Drive",
-  "Prove Yourself",
-  "Streak Winner",
+const quotes = [
+  "Keep pushing, success is near!",
+  "Every hour counts, make it meaningful!",
+  "Small steps each day lead to big results.",
+  "Stay consistent, stay motivated.",
+  "Your hard work will pay off soon!",
+  "Focus on progress, not perfection.",
+  "Turn your dreams into plans, and plans into reality.",
+  "The secret to getting ahead is getting started.",
 ];
 
-interface MotivationalQuoteProps {
-  dayCount: number;
-}
+export const MotivationalQuote = () => {
+  const [quote, setQuote] = useState(quotes[0]);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-export const MotivationalQuote = ({ dayCount }: MotivationalQuoteProps) => {
-  const getQuote = () => {
-    if (dayCount === 0) return "Start Strong";
-    if (dayCount > 10) return "Streak Winner";
-    return dayQuotes[dayCount - 1];
+  const changeQuote = () => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      setQuote(randomQuote);
+      setIsAnimating(false);
+    }, 300);
   };
 
-  const getMeterLevel = () => {
-    if (dayCount > 10) return 10;
-    return dayCount;
-  };
+  useEffect(() => {
+    const interval = setInterval(changeQuote, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="relative bg-gradient-secondary rounded-3xl p-10 shadow-elegant hover:shadow-glow-secondary transition-all duration-500 overflow-hidden group border border-white/20">
@@ -37,38 +39,22 @@ export const MotivationalQuote = ({ dayCount }: MotivationalQuoteProps) => {
       <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-1000 blur-3xl" />
       
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
-              <Sparkles className="w-7 h-7 text-secondary-foreground animate-pulse" />
-            </div>
-            <span className="text-secondary-foreground font-bold text-2xl tracking-wide drop-shadow">Daily Motivation</span>
-          </div>
-          <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg">
-            <Award className="w-6 h-6 text-secondary-foreground" />
-            <span className="text-secondary-foreground font-bold text-xl">
-              Day {dayCount > 10 ? "10+" : dayCount}
-            </span>
-          </div>
+        <div className="flex items-center justify-end mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={changeQuote}
+            className="text-secondary-foreground hover:bg-white/20 hover:rotate-180 transition-all duration-500 w-12 h-12 rounded-xl backdrop-blur-sm shadow-lg hover:shadow-xl"
+          >
+            <RefreshCw className="w-6 h-6" />
+          </Button>
         </div>
         
-        <p className="text-3xl font-black text-secondary-foreground transition-all duration-300 leading-relaxed drop-shadow-lg mb-6">
-          "{getQuote()}"
+        <p className={`text-3xl font-black text-secondary-foreground transition-all duration-300 leading-relaxed drop-shadow-lg text-center ${
+          isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"
+        }`}>
+          "{quote}"
         </p>
-
-        {/* Consistency Meter */}
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-secondary-foreground/90 font-semibold text-sm uppercase tracking-wider">Consistency Meter</span>
-            <span className="text-secondary-foreground font-bold text-lg">{getMeterLevel()}/10+</span>
-          </div>
-          <div className="h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
-            <div 
-              className="h-full bg-gradient-to-r from-success to-success-foreground transition-all duration-1000 rounded-full shadow-glow-success"
-              style={{ width: `${Math.min((getMeterLevel() / 10) * 100, 100)}%` }}
-            />
-          </div>
-        </div>
       </div>
 
       {/* Decorative corners */}

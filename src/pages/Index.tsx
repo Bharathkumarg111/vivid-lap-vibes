@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { StatCard } from "@/components/StatCard";
 import { MotivationalQuote } from "@/components/MotivationalQuote";
+import { ConsistencyMeter } from "@/components/ConsistencyMeter";
 import { SessionHistory } from "@/components/SessionHistory";
 import { toast } from "sonner";
 
@@ -169,7 +170,7 @@ const Index = () => {
 
         {/* Motivational Quote - Moved Up */}
         <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-          <MotivationalQuote dayCount={getConsecutiveDays()} />
+          <MotivationalQuote />
         </div>
 
         {/* Timer Section */}
@@ -231,7 +232,7 @@ const Index = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap justify-center gap-6 animate-fade-in-up pb-8" style={{ animationDelay: "800ms" }}>
+        <div className="flex flex-wrap justify-center gap-6 animate-fade-in-up mb-16" style={{ animationDelay: "800ms" }}>
           <Button
             onClick={resetToday}
             variant="secondary"
@@ -253,12 +254,17 @@ const Index = () => {
           <Button
             onClick={resetData}
             variant="outline"
-            size="lg"
+            size="default"
             className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive group"
           >
-            <RotateCcw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
-            Reset All Data
+            <RotateCcw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+            Reset All
           </Button>
+        </div>
+
+        {/* Consistency Meter at Bottom */}
+        <div className="animate-fade-in-up pb-8" style={{ animationDelay: "900ms" }}>
+          <ConsistencyMeter dayCount={getConsecutiveDays()} />
         </div>
       </div>
     </div>
