@@ -4,12 +4,19 @@ import { Timer } from "lucide-react";
 interface TimerDisplayProps {
   startTime: Date | null;
   isRunning: boolean;
+  isPaused?: boolean;
+  elapsedSeconds?: number;
 }
 
-export const TimerDisplay = ({ startTime, isRunning }: TimerDisplayProps) => {
+export const TimerDisplay = ({ startTime, isRunning, isPaused = false, elapsedSeconds = 0 }: TimerDisplayProps) => {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
+    if (isPaused) {
+      setElapsed(elapsedSeconds);
+      return;
+    }
+    
     if (!isRunning || !startTime) {
       setElapsed(0);
       return;
@@ -22,7 +29,7 @@ export const TimerDisplay = ({ startTime, isRunning }: TimerDisplayProps) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, startTime]);
+  }, [isRunning, startTime, isPaused, elapsedSeconds]);
 
   const hours = Math.floor(elapsed / 3600);
   const minutes = Math.floor((elapsed % 3600) / 60);
@@ -44,12 +51,16 @@ export const TimerDisplay = ({ startTime, isRunning }: TimerDisplayProps) => {
         
         {/* Status indicator */}
         <div className="flex items-center justify-center gap-4 mb-8">
-          <div className={`w-3 h-3 rounded-full ${isRunning ? "bg-success animate-pulse" : "bg-white/50"}`} />
-          <Timer className={`w-10 h-10 text-primary-foreground drop-shadow-lg ${isRunning ? "animate-spin" : ""}`} style={{ animationDuration: "3s" }} />
+          <div className={`w-3 h-3 rounded-full ${
+            isPaused ? "bg-warning" : isRunning ? "bg-success animate-pulse" : "bg-white/50"
+          }`} />
+          <Timer className={`w-10 h-10 text-primary-foreground drop-shadow-lg ${isRunning && !isPaused ? "animate-spin" : ""}`} style={{ animationDuration: "3s" }} />
           <span className="text-2xl font-bold text-primary-foreground tracking-wide uppercase drop-shadow-lg">
-            {isRunning ? "⚡ Session Active" : "Ready to Track"}
+            {isPaused ? "⏸️ Paused" : isRunning ? "⚡ Session Active" : "Ready to Track"}
           </span>
-          <div className={`w-3 h-3 rounded-full ${isRunning ? "bg-success animate-pulse" : "bg-white/50"}`} />
+          <div className={`w-3 h-3 rounded-full ${
+            isPaused ? "bg-warning" : isRunning ? "bg-success animate-pulse" : "bg-white/50"
+          }`} />
         </div>
 
         {/* Timer display */}

@@ -41,6 +41,8 @@ const Index = () => {
   });
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem("usage_data_all");
@@ -50,16 +52,39 @@ const Index = () => {
   }, [usageData, userId]);
 
   const startSession = () => {
-    if (isRunning) {
+    if (isRunning && !isPaused) {
       toast.error("A session is already running!");
       return;
     }
+    
     const now = new Date();
-    setStartTime(now);
+    if (isPaused) {
+      // Resume from pause
+      setStartTime(new Date(now.getTime() - elapsedSeconds * 1000));
+      setIsPaused(false);
+      toast.success("Session resumed!");
+    } else {
+      // Start new session
+      setStartTime(now);
+      setElapsedSeconds(0);
+      toast.success("Session started!", {
+        description: `Started at ${now.toLocaleTimeString()}`,
+      });
+    }
     setIsRunning(true);
-    toast.success("Session started!", {
-      description: `Started at ${now.toLocaleTimeString()}`,
-    });
+  };
+
+  const pauseSession = () => {
+    if (!isRunning || isPaused) return;
+    
+    const now = new Date();
+    if (startTime) {
+      const elapsed = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+      setElapsedSeconds(elapsed);
+    }
+    setIsRunning(false);
+    setIsPaused(true);
+    toast.info("Session paused");
   };
 
   const endSession = () => {
@@ -69,11 +94,18 @@ const Index = () => {
     }
 
     const endTime = new Date();
-    const duration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-    const dateStr = startTime.toISOString().split("T")[0];
+    const totalElapsed = isPaused 
+      ? elapsedSeconds 
+      : (endTime.getTime() - startTime.getTime()) / 1000;
+    const duration = totalElapsed / 3600;
+    
+    const sessionStartTime = isPaused 
+      ? new Date(endTime.getTime() - elapsedSeconds * 1000)
+      : startTime;
+    const dateStr = sessionStartTime.toISOString().split("T")[0];
 
     const session: Session = {
-      start: startTime.toLocaleTimeString(),
+      start: sessionStartTime.toLocaleTimeString(),
       end: endTime.toLocaleTimeString(),
       duration_hours: Math.round(duration * 100) / 100,
     };
@@ -84,7 +116,9 @@ const Index = () => {
     }));
 
     setIsRunning(false);
+    setIsPaused(false);
     setStartTime(null);
+    setElapsedSeconds(0);
 
     toast.success("Session completed!", {
       description: `Duration: ${session.duration_hours.toFixed(2)} hours`,
@@ -197,22 +231,33 @@ const Index = () => {
 
         {/* Timer Section */}
         <div className="mb-16 animate-scale-in" style={{ animationDelay: "300ms" }}>
-          <TimerDisplay startTime={startTime} isRunning={isRunning} />
+          <TimerDisplay startTime={startTime} isRunning={isRunning} isPaused={isPaused} elapsedSeconds={elapsedSeconds} />
           
           <div className="flex flex-wrap justify-center gap-6 mt-12">
             <Button
               onClick={startSession}
-              disabled={isRunning}
+              disabled={isRunning && !isPaused}
               variant="success"
               size="lg"
               className="group relative overflow-hidden"
             >
               <Play className="w-6 h-6 mr-2 group-hover:rotate-12 transition-transform" />
-              <span className="relative z-10">Start Session</span>
+              <span className="relative z-10">{isPaused ? "Resume" : "Start Session"}</span>
             </Button>
+            {isRunning && !isPaused && (
+              <Button
+                onClick={pauseSession}
+                variant="secondary"
+                size="lg"
+                className="group relative overflow-hidden"
+              >
+                <Square className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+                <span className="relative z-10">Pause</span>
+              </Button>
+            )}
             <Button
               onClick={endSession}
-              disabled={!isRunning}
+              disabled={!isRunning && !isPaused}
               variant="destructive"
               size="lg"
               className="group relative overflow-hidden"
