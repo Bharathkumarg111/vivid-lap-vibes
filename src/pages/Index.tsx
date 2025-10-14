@@ -18,17 +18,36 @@ interface UsageData {
   [date: string]: Session[];
 }
 
+interface UserData {
+  [userId: string]: UsageData;
+}
+
+// Generate a unique user ID for this browser/device
+const getUserId = (): string => {
+  let userId = localStorage.getItem("grindmaster_user_id");
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem("grindmaster_user_id", userId);
+  }
+  return userId;
+};
+
 const Index = () => {
+  const [userId] = useState<string>(getUserId());
   const [usageData, setUsageData] = useState<UsageData>(() => {
-    const saved = localStorage.getItem("usage_data");
-    return saved ? JSON.parse(saved) : {};
+    const saved = localStorage.getItem("usage_data_all");
+    const allData: UserData = saved ? JSON.parse(saved) : {};
+    return allData[userId] || {};
   });
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("usage_data", JSON.stringify(usageData));
-  }, [usageData]);
+    const saved = localStorage.getItem("usage_data_all");
+    const allData: UserData = saved ? JSON.parse(saved) : {};
+    allData[userId] = usageData;
+    localStorage.setItem("usage_data_all", JSON.stringify(allData));
+  }, [usageData, userId]);
 
   const startSession = () => {
     if (isRunning) {
@@ -106,10 +125,13 @@ const Index = () => {
   };
 
   const resetData = () => {
-    if (window.confirm("Are you sure you want to delete all usage data?")) {
+    if (window.confirm("Are you sure you want to delete all your usage data?")) {
       setUsageData({});
-      localStorage.removeItem("usage_data");
-      toast.success("All data has been cleared!");
+      const saved = localStorage.getItem("usage_data_all");
+      const allData: UserData = saved ? JSON.parse(saved) : {};
+      delete allData[userId];
+      localStorage.setItem("usage_data_all", JSON.stringify(allData));
+      toast.success("All your data has been cleared!");
     }
   };
 
