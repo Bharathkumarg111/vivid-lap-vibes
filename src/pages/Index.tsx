@@ -94,6 +94,16 @@ const Index = () => {
     toast.success("Data exported successfully!");
   };
 
+  const resetToday = () => {
+    if (window.confirm("Are you sure you want to reset today's sessions?")) {
+      const today = new Date().toISOString().split("T")[0];
+      const newData = { ...usageData };
+      delete newData[today];
+      setUsageData(newData);
+      toast.success("Today's sessions have been cleared!");
+    }
+  };
+
   const resetData = () => {
     if (window.confirm("Are you sure you want to delete all usage data?")) {
       setUsageData({});
@@ -115,6 +125,31 @@ const Index = () => {
       0
     );
 
+  const getConsecutiveDays = () => {
+    const dates = Object.keys(usageData).sort();
+    if (dates.length === 0) return 0;
+
+    let streak = 1;
+    const today = new Date().toISOString().split("T")[0];
+    
+    // Check if today has data, if not start from yesterday
+    let currentDate = new Date(dates.includes(today) ? today : dates[dates.length - 1]);
+    
+    for (let i = dates.length - 2; i >= 0; i--) {
+      const prevDate = new Date(dates[i]);
+      const dayDiff = Math.floor((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (dayDiff === 1) {
+        streak++;
+        currentDate = prevDate;
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-bg relative overflow-hidden">
       {/* Decorative background elements */}
@@ -125,15 +160,20 @@ const Index = () => {
         {/* Header */}
         <header className="text-center mb-16 animate-fade-in-up">
           <h1 className="text-7xl md:text-8xl font-black bg-gradient-primary bg-clip-text text-transparent mb-4 drop-shadow-lg tracking-tight">
-            Laptop Usage Tracker
+            GrindMaster
           </h1>
           <p className="text-2xl text-foreground/80 font-semibold tracking-wide">
             Track your productivity and stay motivated! 🚀✨
           </p>
         </header>
 
+        {/* Motivational Quote - Moved Up */}
+        <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+          <MotivationalQuote dayCount={getConsecutiveDays()} />
+        </div>
+
         {/* Timer Section */}
-        <div className="mb-16 animate-scale-in" style={{ animationDelay: "200ms" }}>
+        <div className="mb-16 animate-scale-in" style={{ animationDelay: "300ms" }}>
           <TimerDisplay startTime={startTime} isRunning={isRunning} />
           
           <div className="flex flex-wrap justify-center gap-6 mt-12">
@@ -185,11 +225,6 @@ const Index = () => {
           />
         </div>
 
-        {/* Motivational Quote */}
-        <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
-          <MotivationalQuote />
-        </div>
-
         {/* Session History */}
         <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "700ms" }}>
           <SessionHistory sessions={usageData} />
@@ -197,6 +232,15 @@ const Index = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-center gap-6 animate-fade-in-up pb-8" style={{ animationDelay: "800ms" }}>
+          <Button
+            onClick={resetToday}
+            variant="secondary"
+            size="lg"
+            className="group"
+          >
+            <RotateCcw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
+            Reset Today
+          </Button>
           <Button
             onClick={exportCSV}
             variant="info"
@@ -213,7 +257,7 @@ const Index = () => {
             className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive group"
           >
             <RotateCcw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
-            Reset Data
+            Reset All Data
           </Button>
         </div>
       </div>
