@@ -16,13 +16,23 @@ interface HoursGraphProps {
 }
 
 export const HoursGraph = ({ usageData }: HoursGraphProps) => {
-  const chartData = Object.entries(usageData)
-    .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
-    .slice(-30) // Last 30 days
-    .map(([date, sessions]) => ({
-      date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      hours: sessions.reduce((sum, s) => sum + s.duration_hours, 0),
-    }));
+  // Generate all days for the current month
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  const chartData = Array.from({ length: daysInMonth }, (_, i) => {
+    const day = i + 1;
+    const date = new Date(year, month, day);
+    const dateStr = date.toISOString().split("T")[0];
+    const hours = usageData[dateStr]?.reduce((sum, s) => sum + s.duration_hours, 0) || 0;
+    
+    return {
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      hours: hours,
+    };
+  });
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
