@@ -7,6 +7,7 @@ import { MotivationalQuote } from "@/components/MotivationalQuote";
 import { ConsistencyMeter } from "@/components/ConsistencyMeter";
 import { SessionHistory } from "@/components/SessionHistory";
 import { UsageCalendar } from "@/components/UsageCalendar";
+import { HoursGraph } from "@/components/HoursGraph";
 import { toast } from "sonner";
 
 interface Session {
@@ -294,9 +295,14 @@ const Index = () => {
           />
         </div>
 
-        {/* Usage Calendar */}
-        <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
-          <UsageCalendar usageData={usageData} />
+        {/* Usage Calendar and Graph */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+          <div className="animate-fade-in-up" style={{ animationDelay: "600ms" }}>
+            <UsageCalendar usageData={usageData} />
+          </div>
+          <div className="animate-fade-in-up" style={{ animationDelay: "650ms" }}>
+            <HoursGraph usageData={usageData} />
+          </div>
         </div>
 
         {/* Session History */}
