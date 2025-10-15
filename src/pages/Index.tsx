@@ -6,6 +6,7 @@ import { StatCard } from "@/components/StatCard";
 import { MotivationalQuote } from "@/components/MotivationalQuote";
 import { ConsistencyMeter } from "@/components/ConsistencyMeter";
 import { SessionHistory } from "@/components/SessionHistory";
+import { UsageCalendar } from "@/components/UsageCalendar";
 import { toast } from "sonner";
 
 interface Session {
@@ -291,6 +292,11 @@ const Index = () => {
             gradient="success"
             delay={500}
           />
+        </div>
+
+        {/* Usage Calendar */}
+        <div className="mb-16 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
+          <UsageCalendar usageData={usageData} />
         </div>
 
         {/* Session History */}
